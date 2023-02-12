@@ -16,7 +16,6 @@ var users []User
 
 func main() {
 	start()
-	fmt.Print(users)
 }
 
 func start() {
@@ -56,6 +55,10 @@ func register() {
 	fmt.Scan(&newUser.email)
 
 	users = append(users, newUser)
+
+	fmt.Println()
+	fmt.Println("Log In\n")
+	authorize()
 }
 
 func generateID() int {
@@ -64,5 +67,31 @@ func generateID() int {
 }
 
 func authorize() {
+	var loggedUser User
+	var inputEmail string
+	var pswrd string
 
+	fmt.Printf("Enter your email: ")
+	fmt.Scan(&inputEmail)
+
+	for i := 0; i < len(users); i++ {
+		if users[i].email == inputEmail {
+			fmt.Printf("Enter your password: ")
+			fmt.Scan(&pswrd)
+			if pswrd == users[i].password {
+				loggedUser = users[i]
+			} else {
+				fmt.Println()
+				fmt.Println("Password is incorrect. Try again.")
+				fmt.Println()
+				start()
+			}
+		} else {
+			fmt.Println()
+			fmt.Println("Email is incorrect. Try again.")
+			fmt.Println()
+			start()
+		}
+	}
+	fmt.Println(loggedUser)
 }
