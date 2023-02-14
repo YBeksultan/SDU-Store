@@ -2,6 +2,8 @@ package main
 
 import "fmt"
 
+// Yerzhanov Beksultan 200103513
+
 type Node struct {
 	Value int
 	Next  *Node
