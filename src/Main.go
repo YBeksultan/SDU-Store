@@ -2,10 +2,9 @@ package main
 
 import (
 	"database/sql"
+	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
 type User struct {
@@ -27,6 +26,7 @@ func main() {
 	router.HandleFunc("/login", login).Methods("POST")
 	router.HandleFunc("/login", showLoginForm).Methods("GET")
 	router.HandleFunc("/welcome", welcome)
+
 	http.ListenAndServe(":8080", router)
 }
 
@@ -43,10 +43,10 @@ func showRegisterForm(w http.ResponseWriter, r *http.Request) {
 func register(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/testdb")
 	if err != nil {
+
 		panic(err.Error())
 	}
 	defer db.Close()
-
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
@@ -57,7 +57,6 @@ func register(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, "Username already taken.")
 		return
 	}
-
 	_, err = db.Exec("INSERT INTO users(username, password) VALUES(?, ?)", username, password)
 	if err != nil {
 		panic(err.Error())
@@ -77,7 +76,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 	defer db.Close()
-
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
@@ -88,10 +86,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, "Invalid username or password.")
 		return
 	}
-
 	t, _ := template.ParseFiles("templates/welcome.html")
 	t.Execute(w, user)
-
 }
 
 func welcome(w http.ResponseWriter, r *http.Request) {
