@@ -1,97 +1,55 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"math/rand"
-	"time"
+	"html/template"
+	"net/http"
 )
 
 type User struct {
-	Id                             int
-	name, surname, password, email string
+	Id                                 int
+	Username, Surname, Password, Email string
 }
 
 var users []User
 
 func main() {
-	start()
+	http.HandleFunc("/", home)
+	http.HandleFunc("/register", register)
+	http.HandleFunc("/login", login)
+	http.ListenAndServe(":8080", nil)
 }
 
-func start() {
-	fmt.Println("Choose a action:\n1) Sign up\n2) Log in")
-	var choice int
-	_, err := fmt.Scanf("%d", &choice)
+func home(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("home.html")
+	t.Execute(w, nil)
+}
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if choice == 1 {
-		register()
-	} else if choice == 2 {
-		authorize()
+func register(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+		newUser := User{Username: username, Password: password}
+		users = append(users, newUser)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	} else {
-		start()
+		t, _ := template.ParseFiles("register.html")
+		t.Execute(w, nil)
 	}
-
 }
 
-func register() {
-	newUser := User{}
-
-	newUser.Id = generateID()
-
-	fmt.Print("Name: ")
-	fmt.Scan(&newUser.name)
-
-	fmt.Print("Surname: ")
-	fmt.Scan(&newUser.surname)
-
-	fmt.Print("Password: ")
-	fmt.Scan(&newUser.password)
-
-	fmt.Print("Email: ")
-	fmt.Scan(&newUser.email)
-
-	users = append(users, newUser)
-
-	fmt.Println()
-	fmt.Println("Log In\n")
-	authorize()
-}
-
-func generateID() int {
-	rand.Seed(time.Now().UnixNano())
-	return rand.Intn(1000000)
-}
-
-func authorize() {
-	var loggedUser User
-	var inputEmail string
-	var pswrd string
-
-	fmt.Printf("Enter your email: ")
-	fmt.Scan(&inputEmail)
-
-	for i := 0; i < len(users); i++ {
-		if users[i].email == inputEmail {
-			fmt.Printf("Enter your password: ")
-			fmt.Scan(&pswrd)
-			if pswrd == users[i].password {
-				loggedUser = users[i]
-			} else {
-				fmt.Println()
-				fmt.Println("Password is incorrect. Try again.")
-				fmt.Println()
-				start()
+func login(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+		for _, user := range users {
+			if user.Username == username && user.Password == password {
+				http.Redirect(w, r, "/welcome", http.StatusSeeOther)
+				return
 			}
-		} else {
-			fmt.Println()
-			fmt.Println("Email is incorrect. Try again.")
-			fmt.Println()
-			start()
 		}
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	} else {
+		t, _ := template.ParseFiles("login.html")
+		t.Execute(w, nil)
 	}
-	fmt.Println(loggedUser)
 }
