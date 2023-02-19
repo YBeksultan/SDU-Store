@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Register</title>
+    <title>Login</title>
 </head>
 <body>
 {{if .}}
 <p>{{.}}</p>
 {{end}}
-<h1>Register</h1>
-<form action="/register" method="post">
+<h1>Login</h1>
+<form action="/login" method="post">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required><br>
 
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required><br>
 
-    <input type="submit" value="Register">
+    <input type="submit" value="Login">
 </form>
 </body>
 </html>
