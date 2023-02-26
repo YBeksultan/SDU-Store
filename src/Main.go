@@ -17,6 +17,7 @@ var users []User
 func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/register", registerHandler)
+	http.HandleFunc("/login", loginHandler)
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -59,5 +60,32 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		t.Execute(w, nil)
+	}
+}
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		t, err := template.ParseFiles("templates/login.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		t.Execute(w, nil)
+	} else if r.Method == "POST" {
+		id, _ := strconv.Atoi(r.FormValue("id"))
+		password := r.FormValue("password")
+
+		for _, user := range users {
+			if user.Id == id && user.Password == password {
+				t, err := template.ParseFiles("templates/login-success.html")
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				t.Execute(w, nil)
+				return
+			}
+		}
+
+		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 	}
 }
