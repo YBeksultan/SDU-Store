@@ -1,32 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-    <style>
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+{{ define "login" }}
+{{ template "header" }}
 
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-    </style>
-</head>
-<body>
-{{if .}}
-<p>{{.}}</p>
-{{end}}
-<h1>Login</h1>
-<form action="/login" method="post">
-    <label for="id">ID:</label>
-    <input type="number" id="id" name="id" required><br>
+<div class="login-form">
+    <form action="/login" method="post">
+        <label for="id">ID:</label>
+        <input type="number" id="id" name="id" required><br>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
 
-    <input type="submit" value="Login">
-</form>
-</body>
-</html>
+        <input type="submit" value="Login">
+    </form>
+</div>
+
+{{ template "footer" }}
+{{ end }}

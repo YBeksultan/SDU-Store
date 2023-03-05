@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	_ "fmt"
 	"html/template"
 	"net/http"
@@ -15,30 +16,30 @@ type User struct {
 var users []User
 
 func main() {
-	http.HandleFunc("/", homeHandler)
+	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/login", loginHandler)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	http.ListenAndServe(":8080", nil)
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/home.html")
+	t, err := template.ParseFiles("templates/home.html", "templates/header.html", "templates/footer.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		fmt.Fprintf(w, err.Error())
 	}
 
-	t.Execute(w, nil)
+	t.ExecuteTemplate(w, "home", nil)
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		t, err := template.ParseFiles("templates/register.html")
+		t, err := template.ParseFiles("templates/register.html", "templates/header.html", "templates/footer.html")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		t.Execute(w, nil)
+		t.ExecuteTemplate(w, "register", nil)
 	} else if r.Method == "POST" {
 		id, _ := strconv.Atoi(r.FormValue("id"))
 		name := r.FormValue("username")
@@ -54,34 +55,34 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 		users = append(users, User{Id: id, Username: name, Surname: surname, Password: password, Email: email})
 
-		t, err := template.ParseFiles("templates/register-success.html")
+		t, err := template.ParseFiles("templates/register-success.html", "templates/header.html", "templates/footer.html")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		t.Execute(w, nil)
+		t.ExecuteTemplate(w, "register-success", nil)
 	}
 }
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		t, err := template.ParseFiles("templates/login.html")
+		t, err := template.ParseFiles("templates/login.html", "templates/header.html", "templates/footer.html")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		t.Execute(w, nil)
+		t.ExecuteTemplate(w, "login", nil)
 	} else if r.Method == "POST" {
 		id, _ := strconv.Atoi(r.FormValue("id"))
 		password := r.FormValue("password")
 
 		for _, user := range users {
 			if user.Id == id && user.Password == password {
-				t, err := template.ParseFiles("templates/login-success.html")
+				t, err := template.ParseFiles("templates/login-success.html", "templates/header.html", "templates/footer.html")
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
-				t.Execute(w, nil)
+				t.ExecuteTemplate(w, "login-success", nil)
 				return
 			}
 		}
