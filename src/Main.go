@@ -118,27 +118,53 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func catalogHandler(w http.ResponseWriter, r *http.Request) {
-
-	rows, err := db.Query("SELECT * FROM items")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-
-	items := make([]Item, 0)
-
-	for rows.Next() {
-		var item Item
-		err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemDesc, &item.ItemPrice, &item.ItemImage)
+	if r.Method == "GET" {
+		rows, err := db.Query("SELECT * FROM items")
 		if err != nil {
 			log.Fatal(err)
 		}
-		items = append(items, item)
+		defer rows.Close()
+
+		items := make([]Item, 0)
+
+		for rows.Next() {
+			var item Item
+			err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemDesc, &item.ItemPrice, &item.ItemImage)
+			if err != nil {
+				log.Fatal(err)
+			}
+			items = append(items, item)
+		}
+
+		tmpl := template.Must(template.ParseFiles("templates/catalog.html"))
+		err = tmpl.Execute(w, items)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else if r.Method == "POST" {
+		name := r.FormValue("name")
+		rows, err := db.Query("SELECT * FROM items WHERE item_name LIKE ?", "%"+name+"%")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		// Render search results as an HTML table
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		fmt.Fprintf(w, "<table>")
+		for rows.Next() {
+			var item_id int
+			var item_name string
+			var item_desc string
+			var item_price float64
+			var item_image string
+			err := rows.Scan(&item_id, &item_name, &item_desc, &item_price, &item_image)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Fprintf(w, "<tr><td>%d</td><td>%s</td><td>%s</td><td>%.2f</td><td><img src=\"%s\"></td></tr>", item_id, item_name, item_desc, item_price, item_image)
+		}
+		fmt.Fprintf(w, "</table>")
 	}
 
-	tmpl := template.Must(template.ParseFiles("templates/catalog.html"))
-	err = tmpl.Execute(w, items)
-	if err != nil {
-		log.Fatal(err)
-	}
 }
