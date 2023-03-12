@@ -6,6 +6,7 @@ import (
 	_ "fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -13,6 +14,14 @@ import (
 type User struct {
 	Id                                 int
 	Username, Surname, Password, Email string
+}
+
+type Item struct {
+	ItemId    int
+	ItemName  string
+	ItemDesc  string
+	ItemPrice float64
+	ItemImage string
 }
 
 var db *sql.DB
@@ -26,6 +35,7 @@ func main() {
 	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/catalog", catalogHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	http.ListenAndServe(":8080", nil)
 }
@@ -104,5 +114,31 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+	}
+}
+
+func catalogHandler(w http.ResponseWriter, r *http.Request) {
+
+	rows, err := db.Query("SELECT * FROM items")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	items := make([]Item, 0)
+
+	for rows.Next() {
+		var item Item
+		err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemDesc, &item.ItemPrice, &item.ItemImage)
+		if err != nil {
+			log.Fatal(err)
+		}
+		items = append(items, item)
+	}
+
+	tmpl := template.Must(template.ParseFiles("templates/catalog.html"))
+	err = tmpl.Execute(w, items)
+	if err != nil {
+		log.Fatal(err)
 	}
 }

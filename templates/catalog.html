@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Items Catalog</title>
+</head>
+<body>
+<div class="search-form">
+  <form action="/search" method="post">
+    <h1>Looking for...</h1><br>
+    <div class="search-btn">
+      <input type="text" id="id" name="id">
+
+      <input type="submit" value="Search">
+    </div>
+  </form>
+</div>
+<h1>Items Catalog</h1>
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Price</th>
+    <th>Image</th>
+  </tr>
+  </thead>
+  <tbody>
+  {{range .}}
+  <tr>
+    <td>{{.ItemId}}</td>
+    <td>{{.ItemName}}</td>
+    <td>{{.ItemDesc}}</td>
+    <td>{{.ItemPrice}}</td>
+    <td><img src="items\sweatshirt_blue_big_lettering.jpg"></td>
+  </tr>
+  {{end}}
+  </tbody>
+</table>
+<img src= "http:\\localhost\db\items\sweatshirt_blue_big_lettering.jpg" alt="" width= "970" height="224"/>
+</body>
+</html>
