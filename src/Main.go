@@ -148,7 +148,6 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		defer rows.Close()
 
-		// Render search results as an HTML table
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		fmt.Fprintf(w, "<table>")
 		for rows.Next() {
@@ -160,7 +159,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Fprintf(w, "<tr><td>%d</td><td>%s</td><td>%s</td><td>%.2f</td><td><img src=\"%s\"></td></tr>", item_id, item_name, item_price, item_image)
+			fmt.Fprintf(w, "<tr><td>%d</td><td>%s</td><td>%.2f</td><td><img src=\"%s\"></td></tr>", item_id, item_name, item_price, item_image)
 		}
 		fmt.Fprintf(w, "</table>")
 	}
