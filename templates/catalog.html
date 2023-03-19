@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Items Catalog</title>
-</head>
-<body>
+{{ define "catalog" }}
+{{ template "header" }}
+
 <div class="search-form">
   <form action="/catalog" method="post">
     <h1>Looking for...</h1><br>
@@ -21,7 +18,7 @@
     <th>Name</th>
     <th>Description</th>
     <th>Price</th>
-    <th>Image</th>
+    <th class="image_of_item">Image</th>
   </tr>
   </thead>
   <tbody>
@@ -31,10 +28,11 @@
     <td>{{.ItemName}}</td>
     <td>{{.ItemDesc}}</td>
     <td>{{.ItemPrice}}</td>
-    <td><img src="{{.ItemImage}}" alt="" width= "540" height="540"></td>
+    <td><img src="{{.ItemImage}}" alt="" width= "250" height="250"></td>
   </tr>
   {{end}}
   </tbody>
 </table>
-</body>
-</html>
+
+{{ template "footer" }}
+{{ end }}
