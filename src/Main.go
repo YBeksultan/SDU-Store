@@ -19,7 +19,6 @@ type User struct {
 type Item struct {
 	ItemId    int
 	ItemName  string
-	ItemDesc  string
 	ItemPrice float64
 	ItemImage string
 }
@@ -129,7 +128,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 
 		for rows.Next() {
 			var item Item
-			err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemDesc, &item.ItemPrice, &item.ItemImage)
+			err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -155,14 +154,13 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 		for rows.Next() {
 			var item_id int
 			var item_name string
-			var item_desc string
 			var item_price float64
 			var item_image string
-			err := rows.Scan(&item_id, &item_name, &item_desc, &item_price, &item_image)
+			err := rows.Scan(&item_id, &item_name, &item_price, &item_image)
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Fprintf(w, "<tr><td>%d</td><td>%s</td><td>%s</td><td>%.2f</td><td><img src=\"%s\"></td></tr>", item_id, item_name, item_desc, item_price, item_image)
+			fmt.Fprintf(w, "<tr><td>%d</td><td>%s</td><td>%s</td><td>%.2f</td><td><img src=\"%s\"></td></tr>", item_id, item_name, item_price, item_image)
 		}
 		fmt.Fprintf(w, "</table>")
 	}
