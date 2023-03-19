@@ -28,7 +28,7 @@ var db *sql.DB
 var err error
 
 func main() {
-	db, err = sql.Open("mysql", "root:Bekasql20232003@/sys")
+	db, err = sql.Open("mysql", "root:9Wyk%L7nUvm4@/sdu_store")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -136,8 +136,8 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 			items = append(items, item)
 		}
 
-		tmpl := template.Must(template.ParseFiles("templates/catalog.html"))
-		err = tmpl.Execute(w, items)
+		tmpl := template.Must(template.ParseFiles("templates/catalog.html", "templates/header.html", "templates/footer.html"))
+		err = tmpl.ExecuteTemplate(w, "catalog", items)
 		if err != nil {
 			log.Fatal(err)
 		}
