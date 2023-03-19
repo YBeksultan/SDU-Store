@@ -146,22 +146,27 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		if err != nil {
+			log.Fatal(err)
+		}
 		defer rows.Close()
 
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprintf(w, "<table>")
+		items := make([]Item, 0)
+
 		for rows.Next() {
-			var item_id int
-			var item_name string
-			var item_price float64
-			var item_image string
-			err := rows.Scan(&item_id, &item_name, &item_price, &item_image)
+			var item Item
+			err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Fprintf(w, "<tr><td>%d</td><td>%s</td><td>%.2f</td><td><img src=\"%s\"></td></tr>", item_id, item_name, item_price, item_image)
+			items = append(items, item)
 		}
-		fmt.Fprintf(w, "</table>")
+
+		tmpl := template.Must(template.ParseFiles("templates/catalog.html", "templates/header.html", "templates/footer.html"))
+		err = tmpl.ExecuteTemplate(w, "catalog", items)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 }

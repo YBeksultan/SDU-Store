@@ -18,15 +18,15 @@
 
 <br>
 
-
-
-<div class="item-container">
-    <div class="item-row">
+<div class="serv">
+    <ul>
         {{range .}}
-        <div class="item-column">
+        <li>
             <div class="card">
                 <img src="{{.ItemImage}}" alt="QR product" style="width:100%">
-                <h1 class="item-name">{{.ItemName}}</h1>
+                <div class="item-text">
+                    <h1 class="item-name">{{.ItemName}}</h1>
+                </div>
                 <br>
                 <p class="price">Cost: {{.ItemPrice}}₸</p>
                 <br>
@@ -34,10 +34,11 @@
                     <button>Add to Cart</button>
                 </p>
             </div>
-        </div>
+        </li>
         {{end}}
-    </div>
+    </ul>
 </div>
+
 
 <br>
 <br>

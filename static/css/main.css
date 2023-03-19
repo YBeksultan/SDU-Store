@@ -266,25 +266,26 @@ input::-webkit-inner-spin-button {
 input[type=number] {
     -moz-appearance: textfield;
 }
-
-.item-column {
-    display: block;
-    margin: auto;
-    width: 33%;
-    border: 1px solid #ccc;
+.item-text{
+    padding: 12% 0;
+    height: 200px;
 }
-
-.item-container {
+.item-name{
+}
+.serv ul {
     display: flex;
     flex-wrap: wrap;
+    padding-left: 0;
 }
 
-.row{
-    display: flex;
-    margin: 0 auto;
-    flex-direction: row;
+.serv ul li {
+    list-style: none;
+    flex: 0 0 25%;
+    margin-bottom: 50px;
 }
+.item-text{
 
+}
 .card {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
     max-width: 250px;
@@ -292,7 +293,6 @@ input[type=number] {
     text-align: center;
     background: #a7adc6;
     font-size: 13px;
-    /*border: 2px solid gray;*/
 }
 
 .card .item-name {
