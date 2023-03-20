@@ -1,0 +1,47 @@
+{{ define "catalog" }}
+{{ template "header" }}
+<script type="text/javascript" src="static/js/search.js"></script>
+<div class="search-form">
+    <form class="search" action="/catalog" method="get" onsubmit="saveSearch();" >
+        <h1>Looking for...</h1><br>
+        <div class="search-btn">
+            <input class="search-area" type="text" id="search" name="search">
+            <input class="search-btn" type="submit" value="Search">
+        </div>
+    </form>
+</div>
+<br>
+<br>
+
+<h1>Items Catalog</h1>
+
+<br>
+
+<div class="serv">
+    <ul>
+        {{range .}}
+        <li>
+            <div class="card">
+                <img src="{{.ItemImage}}" alt="QR product" style="width:100%">
+                <div class="item-text">
+                    <h1 class="item-name">{{.ItemName}}</h1>
+                </div>
+                <br>
+                <p class="price">Cost: {{.ItemPrice}}₸</p>
+                <br>
+                <p>
+                    <button>Add to Cart</button>
+                </p>
+            </div>
+        </li>
+        {{end}}
+    </ul>
+</div>
+
+
+<br>
+<br>
+
+
+{{ template "footer" }}
+{{ end }}
