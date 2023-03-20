@@ -118,30 +118,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func catalogHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		rows, err := db.Query("SELECT * FROM items")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer rows.Close()
-
-		items := make([]Item, 0)
-
-		for rows.Next() {
-			var item Item
-			err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
-			if err != nil {
-				log.Fatal(err)
-			}
-			items = append(items, item)
-		}
-
-		tmpl := template.Must(template.ParseFiles("templates/catalog.html", "templates/header.html", "templates/footer.html"))
-		err = tmpl.ExecuteTemplate(w, "catalog", items)
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else if r.Method == "POST" {
-		name := r.FormValue("name")
+		name := r.FormValue("search")
 		rows, err := db.Query("SELECT * FROM items WHERE item_name LIKE ?", "%"+name+"%")
 		if err != nil {
 			log.Fatal(err)
@@ -167,6 +144,30 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
+	} else {
+		rows, err := db.Query("SELECT * FROM items")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		items := make([]Item, 0)
+
+		for rows.Next() {
+			var item Item
+			err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+			if err != nil {
+				log.Fatal(err)
+			}
+			items = append(items, item)
+		}
+
+		tmpl := template.Must(template.ParseFiles("templates/catalog.html", "templates/header.html", "templates/footer.html"))
+		err = tmpl.ExecuteTemplate(w, "catalog", items)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 	}
 
 }

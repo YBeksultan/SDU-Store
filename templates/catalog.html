@@ -1,16 +1,15 @@
 {{ define "catalog" }}
 {{ template "header" }}
-
+<script type="text/javascript" src="static/js/search.js"></script>
 <div class="search-form">
-    <form class="search" action="/catalog" method="post">
+    <form class="search" action="/catalog" method="get" onsubmit="saveSearch();" >
         <h1>Looking for...</h1><br>
         <div class="search-btn">
-            <input class="search-area" type="text" id="name" name="name">
+            <input class="search-area" type="text" id="search" name="search">
             <input class="search-btn" type="submit" value="Search">
         </div>
     </form>
 </div>
-
 <br>
 <br>
 
