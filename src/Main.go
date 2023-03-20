@@ -27,11 +27,14 @@ type Item struct {
 	ItemImage string
 }
 
-var store = sessions.NewCookieStore([]byte(os.Getenv(generateSessionKey())))
-var db *sql.DB
-var err error
+var (
+	db    *sql.DB
+	err   error
+	store = sessions.NewCookieStore([]byte(os.Getenv(generateSessionKey())))
+)
 
 func main() {
+	store = sessions.NewCookieStore([]byte(os.Getenv(generateSessionKey())))
 	db, err = sql.Open("mysql", "root:9Wyk%L7nUvm4@/sdu_store")
 	if err != nil {
 		panic(err.Error())
@@ -40,6 +43,7 @@ func main() {
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/catalog", catalogHandler)
+	http.HandleFunc("/logout", logout)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	http.ListenAndServe(":8080", nil)
 
@@ -55,13 +59,9 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
-	session, err := store.Get(r, "session")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	session, _ := store.Get(r, "session")
 
-	if session.Values["registered"] != nil {
+	if session.Values["entered"] != nil && session.Values["entered"].(bool) {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
@@ -92,23 +92,20 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		session.Values["registered"] = true
+		session.Values["entered"] = true
 		err = session.Save(r, w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		t.ExecuteTemplate(w, "register-success", nil)
 	}
 }
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	session, err := store.Get(r, "session")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	session, _ := store.Get(r, "session")
 
-	if session.Values["registered"] != nil {
+	if session.Values["entered"] != nil && session.Values["entered"].(bool) {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
@@ -141,6 +138,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+			session.Values["entered"] = true
 			t.ExecuteTemplate(w, "login-success", nil)
 			return
 		}
@@ -148,8 +146,21 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 	}
 }
+func logout(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "session")
 
+	session.Values["entered"] = false
+	session.Save(r, w)
+
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
+}
 func catalogHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	session.Values["registered"] = nil
 	if r.Method == "GET" {
 		name := r.FormValue("search")
 		rows, err := db.Query("SELECT * FROM items WHERE item_name LIKE ?", "%"+name+"%")
