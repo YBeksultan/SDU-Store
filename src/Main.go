@@ -43,6 +43,8 @@ func main() {
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/catalog", catalogHandler)
+	http.HandleFunc("/about", aboutHandler)
+	http.HandleFunc("/contact", contactHandler)
 	http.HandleFunc("/logout", logout)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	http.ListenAndServe(":8080", nil)
@@ -139,6 +141,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			session.Values["entered"] = true
+			err = session.Save(r, w)
 			t.ExecuteTemplate(w, "login-success", nil)
 			return
 		}
@@ -214,6 +217,24 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+}
+
+func aboutHandler(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("templates/about.html", "templates/header.html", "templates/footer.html")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
+
+	t.ExecuteTemplate(w, "about", nil)
+}
+
+func contactHandler(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("templates/contact.html", "templates/header.html", "templates/footer.html")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
+
+	t.ExecuteTemplate(w, "contact", nil)
 }
 
 func generateSessionKey() string {

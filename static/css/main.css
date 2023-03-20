@@ -11,6 +11,10 @@ body {
     background: #d8d8d8;
 }
 
+html, body {
+    height: 100%;
+}
+
 ::selection {
     color: #000;
     background: #fff;
@@ -130,15 +134,17 @@ footer {
     color: #edf2f4;
     bottom: 0;
     height: 2em;
+    margin-top: -2em;
     left: 0;
-    margin-top: 15px;
     width: 100%;
 
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     text-align: center;
+    clear: both;
 }
 
 h1 {
@@ -147,23 +153,23 @@ h1 {
 
 .register-success {
     width: 1000px;
+    min-height: 100%;
     padding: 25vh;
-    padding-bottom: 352px;
     text-align: center;
     margin: 0 auto auto auto;
 }
 
 .login-success {
     width: 1000px;
+    min-height: 100%;
     padding: 25vh;
-    padding-bottom: 352px;
     text-align: center;
     margin: 0 auto auto auto;
 }
 
 .register-form {
+    min-height: 100%;
     padding-top: 12vh;
-    padding-bottom: 8.5vh;
     width: 450px;
     align-content: center;
     margin: 0 auto auto auto;
@@ -171,7 +177,7 @@ h1 {
 
 .login-form {
     padding-top: 200px;
-    padding-bottom: 204px;
+    min-height: 100%;
     width: 500px;
     align-content: center;
     margin: 0 auto 0 auto;
@@ -266,12 +272,15 @@ input::-webkit-inner-spin-button {
 input[type=number] {
     -moz-appearance: textfield;
 }
-.item-text{
+
+.item-text {
     padding: 12% 0;
     height: 200px;
 }
-.item-name{
+
+.item-name {
 }
+
 .serv ul {
     display: flex;
     flex-wrap: wrap;
@@ -283,9 +292,11 @@ input[type=number] {
     flex: 0 0 25%;
     margin-bottom: 50px;
 }
-.item-text{
+
+.item-text {
 
 }
+
 .card {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
     max-width: 250px;
@@ -318,4 +329,122 @@ input[type=number] {
 
 .card button:hover {
     opacity: 0.7;
+}
+
+
+.about-column {
+    width: 25%;
+    margin-bottom: 16px;
+    padding: 0 8px;
+}
+
+.about-row {
+    margin: 0 auto 0 auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.about-card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    margin: 8px;
+    background-color: #a7adc6;
+}
+
+.about-page {
+    padding-top: 4.7%;
+    min-height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.about-section {
+    padding: 50px;
+    text-align: center;
+    background-color: #a7adc6;
+    color: black;
+    font-size: 20px;
+    padding-right: 25%;
+    padding-left: 25%;
+}
+
+.about-container {
+    padding: 16px;
+}
+
+.about-container::after, .row::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.about-title {
+    font-weight: bold;
+    color: #2d3b55;
+}
+
+
+@media screen and (max-width: 650px) {
+    .about-column {
+        width: 100%;
+        display: block;
+    }
+
+    .contact-column {
+        width: 100%;
+        display: block;
+    }
+}
+
+
+.contact-column {
+    width: 25%;
+    margin-bottom: 16px;
+    padding: 0 8px;
+}
+
+.contact-row {
+    margin: 0 auto 0 auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.contact-card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    margin: 8px;
+}
+
+.contact-page {
+    padding-top: 4.7%;
+    min-height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.contact-section {
+    padding: 50px;
+    text-align: center;
+    background-color: #a7adc6;
+    color: black;
+    font-size: 20px;
+}
+
+.contact-container {
+    padding: 16px;
+}
+
+.contact-container::after, .row::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.contact-title {
+    font-weight: bold;
+    color: #2d3b55;
 }
