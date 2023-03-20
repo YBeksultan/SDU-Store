@@ -414,8 +414,10 @@ input[type=number] {
 
 .contact-card {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    margin: 8px;
+    text-align: center;
     width: fit-content;
+    font-size: 20px;
+    background-color: #a7adc6;
 }
 
 .contact-page {
