@@ -1,13 +1,17 @@
 package main
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	_ "fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/sessions"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -23,6 +27,7 @@ type Item struct {
 	ItemImage string
 }
 
+var store = sessions.NewCookieStore([]byte(os.Getenv(generateSessionKey())))
 var db *sql.DB
 var err error
 
@@ -37,6 +42,7 @@ func main() {
 	http.HandleFunc("/catalog", catalogHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	http.ListenAndServe(":8080", nil)
+
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,6 +55,16 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if session.Values["registered"] != nil {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
 	if r.Method == "GET" {
 		t, err := template.ParseFiles("templates/register.html", "templates/header.html", "templates/footer.html")
 		if err != nil {
@@ -62,8 +78,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		surname := r.FormValue("surname")
 		password := r.FormValue("password")
 		email := r.FormValue("email")
-		query := "INSERT INTO users VALUES ('" + strconv.Itoa(id) + "','" + name +
-			"','" + surname + "','" + password + "','" + email + "');"
+		var user User = User{id, name, surname, password, email}
+		query := "INSERT INTO users VALUES ('" + strconv.Itoa(user.Id) + "','" + user.Username +
+			"','" + user.Surname + "','" + user.Password + "','" + user.Email + "');"
 		insert, err := db.Query(query)
 		if err != nil {
 			fmt.Println(query)
@@ -75,10 +92,26 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		session.Values["registered"] = true
+		err = session.Save(r, w)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		t.ExecuteTemplate(w, "register-success", nil)
 	}
 }
 func loginHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := store.Get(r, "session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if session.Values["registered"] != nil {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
 	if r.Method == "GET" {
 		t, err := template.ParseFiles("templates/login.html", "templates/header.html", "templates/footer.html")
 		if err != nil {
@@ -170,4 +203,13 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+}
+
+func generateSessionKey() string {
+	key := make([]byte, 32)
+	_, err := rand.Read(key)
+	if err != nil {
+		return ""
+	}
+	return base64.StdEncoding.EncodeToString(key)
 }
