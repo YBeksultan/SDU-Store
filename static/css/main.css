@@ -400,9 +400,7 @@ input[type=number] {
 
 
 .contact-column {
-    width: 25%;
-    margin-bottom: 16px;
-    padding: 0 8px;
+    text-align: left;
 }
 
 .contact-row {
@@ -417,25 +415,23 @@ input[type=number] {
 .contact-card {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     margin: 8px;
+    width: fit-content;
 }
 
 .contact-page {
     padding-top: 4.7%;
     min-height: 100%;
-    align-items: center;
-    justify-content: center;
 }
 
 .contact-section {
     padding: 50px;
-    text-align: center;
     background-color: #a7adc6;
     color: black;
     font-size: 20px;
 }
 
 .contact-container {
-    padding: 16px;
+    padding: 20px 100px;
 }
 
 .contact-container::after, .row::after {
