@@ -159,19 +159,19 @@ h1 {
     margin: 0 auto auto auto;
 }
 
-.login-success {
-    width: 1000px;
-    min-height: 100%;
-    padding: 25vh;
-    text-align: center;
-    margin: 0 auto auto auto;
-}
-
 .register-form {
     min-height: 100%;
     padding-top: 12vh;
     width: 450px;
     align-content: center;
+    margin: 0 auto auto auto;
+}
+
+.login-success {
+    width: 1000px;
+    min-height: 100%;
+    padding: 25vh;
+    text-align: center;
     margin: 0 auto auto auto;
 }
 
@@ -275,7 +275,7 @@ input[type=number] {
 
 .item-text {
     padding: 12% 0;
-    height: 200px;
+    height: 220px;
 }
 
 .item-name {
@@ -445,4 +445,34 @@ input[type=number] {
 .contact-title {
     font-weight: bold;
     color: #2d3b55;
+}
+
+.star-wrapper {
+    direction: rtl;
+}
+.star-wrapper a {
+    font-size: 2em;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.5s;
+    margin: 4px;
+}
+.star-wrapper a:hover {
+    color: gold;
+    transform: scale(1.3);
+}
+.s1:hover ~ a {
+    color: gold;
+}
+.s2:hover ~ a {
+    color: gold;
+}
+.s3:hover ~ a {
+    color: gold;
+}
+.s4:hover ~ a {
+    color: gold;
+}
+.s5:hover ~ a {
+    color: gold;
 }

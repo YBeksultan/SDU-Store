@@ -2,7 +2,7 @@
 {{ template "header" }}
 <script type="text/javascript" src="static/js/search.js"></script>
 <div class="search-form">
-    <form class="search" action="/catalog" method="get" onsubmit="saveSearch();" >
+    <form class="search" action="/catalog" method="get" onsubmit="saveSearch();">
         <h1>Looking for...</h1><br>
         <div class="search-btn">
             <input class="search-area" type="text" id="search" name="search">
@@ -25,6 +25,14 @@
                 <img src="{{.ItemImage}}" alt="QR product" style="width:100%">
                 <div class="item-text">
                     <h1 class="item-name">{{.ItemName}}</h1>
+                </div>
+                <br>
+                <div class="star-wrapper">
+                    <a href="#" class="fas fa-star s1"></a>
+                    <a href="#" class="fas fa-star s2"></a>
+                    <a href="#" class="fas fa-star s3"></a>
+                    <a href="#" class="fas fa-star s4"></a>
+                    <a href="#" class="fas fa-star s5"></a>
                 </div>
                 <br>
                 <p class="price">Cost: {{.ItemPrice}}₸</p>
