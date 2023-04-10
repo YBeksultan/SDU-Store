@@ -223,6 +223,9 @@ h1 {
 }
 
 .button-value {
+    width: 105px;
+    text-align: center;
+    margin-bottom: 5px;
     border: 2px solid #2d3b55;
     padding: 1em 1.1em;
     border-radius: 3em;

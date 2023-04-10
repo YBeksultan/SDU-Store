@@ -158,30 +158,90 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 func catalogHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		name := r.FormValue("search")
-		rows, err := db.Query("SELECT * FROM items WHERE item_name LIKE ?", "%"+name+"%")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer rows.Close()
+	if r.Method == "POST" {
+		priceBy := r.FormValue("priceby")
+		category := r.FormValue("category")
+		if category != "" {
+			if category == "All" {
+				query := "SELECT * FROM items"
+				if priceBy == "asc" {
+					query += " ORDER BY item_price ASC"
+				} else if priceBy == "desc" {
+					query += " ORDER BY item_price DESC"
+				}
+				fmt.Println("Query" + query + " Priceby:" + priceBy)
+				rows, err := db.Query(query)
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer rows.Close()
 
-		items := make([]Item, 0)
+				items := make([]Item, 0)
 
-		for rows.Next() {
-			var item Item
-			err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+				for rows.Next() {
+					var item Item
+					err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+					if err != nil {
+						log.Fatal(err)
+					}
+					items = append(items, item)
+				}
+
+				tmpl := template.Must(template.ParseFiles("templates/catalog.html", "templates/header.html", "templates/footer.html"))
+				err = tmpl.ExecuteTemplate(w, "catalog", items)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else {
+				rows, err := db.Query("SELECT * FROM items WHERE item_name LIKE ?", "%"+category+"%")
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer rows.Close()
+
+				items := make([]Item, 0)
+
+				for rows.Next() {
+					var item Item
+					err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+					if err != nil {
+						log.Fatal(err)
+					}
+					items = append(items, item)
+				}
+
+				tmpl := template.Must(template.ParseFiles("templates/catalog.html", "templates/header.html", "templates/footer.html"))
+				err = tmpl.ExecuteTemplate(w, "catalog", items)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+		} else {
+			name := r.FormValue("search")
+			rows, err := db.Query("SELECT * FROM items WHERE item_name LIKE ?", "%"+name+"%")
 			if err != nil {
 				log.Fatal(err)
 			}
-			items = append(items, item)
+			defer rows.Close()
+
+			items := make([]Item, 0)
+
+			for rows.Next() {
+				var item Item
+				err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+				if err != nil {
+					log.Fatal(err)
+				}
+				items = append(items, item)
+			}
+
+			tmpl := template.Must(template.ParseFiles("templates/catalog.html", "templates/header.html", "templates/footer.html"))
+			err = tmpl.ExecuteTemplate(w, "catalog", items)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 
-		tmpl := template.Must(template.ParseFiles("templates/catalog.html", "templates/header.html", "templates/footer.html"))
-		err = tmpl.ExecuteTemplate(w, "catalog", items)
-		if err != nil {
-			log.Fatal(err)
-		}
 	} else {
 		rows, err := db.Query("SELECT * FROM items")
 		if err != nil {

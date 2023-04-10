@@ -2,45 +2,46 @@
 {{ template "header" }}
 <script type="text/javascript" src="static/js/search.js"></script>
 <div class="search-form">
-    <form class="search" action="/catalog" method="get" onsubmit="saveSearch();">
+    <form class="search" action="/catalog" method="POST">
         <h1>Looking for...</h1><br>
         <div class="search-btn">
-            <input class="search-area" type="text" id="search" name="search">
+            <input class="search-area" type="text" name="search">
             <input class="search-btn" type="submit" value="Search">
             <div class="dropdown">
-                <button class="dropbtn">Price by:</button>
-                <div class="dropdown-content">
-                    <a href="#">Ascending order</a>
-                    <a href="#">Descending order</a>
-                </div>
+                <label for="priceby">Price by:</label>
+                <select id="priceby" name="priceby">
+                    <option value="">Choose order</option>
+                    <option value="asc">Ascending order</option>
+                    <option value="desc">Descending order</option>
+                </select>
             </div>
         </div>
 
         <div id="buttons">
-            <button class="button-value" onclick="filterProduct('all')">All</button>
-            <button class="button-value" onclick="filterProduct('Cup')">
-                Cup
+            <button class="button-value" value="All" name="category">All</button>
+            <button class="button-value" value='Cup' name="category">
+                Cupm
             </button>
-            <button class="button-value" onclick="filterProduct('Hoodie')">
+            <button class="button-value" value='Hoodie' name="category" >
                 Hoodie
-            </button>
-            <button class="button-value" onclick="filterProduct('Cap')">
+            </button >
+            <button class="button-value" value='Cap' name="category">
                 Cap
             </button>
-            <button class="button-value" onclick="filterProduct('T-Shirt')">
+            <button class="button-value" value='T-Shirt' name="category">
                 T-Shirt
             </button>
-            <button class="button-value" onclick="filterProduct('Panama')">
+            <button class="button-value" value='Panama' name="category">
                 Panama
             </button>
             </button>
-            <button class="button-value" onclick="filterProduct('Shopper')">
+            <button class="button-value" value='Shopper' name="category">
                 Shopper
             </button>
-            <button class="button-value" onclick="filterProduct('Skirt')">
+            <button class="button-value" value='Skirt' name="category">
                 Skirt
             </button>
-            <button class="button-value" onclick="filterProduct('Sweatshirt')">
+            <button class="button-value" value='Sweatshirt' name="category">
                 Sweatshirt
             </button>
         </div>
@@ -86,7 +87,31 @@
 
 <br>
 <br>
+<script>
+    const buttonStates = {};
 
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            buttonStates[button.value] = !buttonStates[button.value];
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `/catalog?${getQueryString(buttonStates)}`);
+            xhr.onload = () => {
+            };
+            xhr.send();
+        });
+    });
+
+    function getQueryString(buttonStates) {
+        const params = [];
+        for (const [key, value] of Object.entries(buttonStates)) {
+            if (value) {
+                params.push(`cloth_type=${encodeURIComponent(key)}`);
+            }
+        }
+        return params.join('&');
+    }
+</script>
 
 {{ template "footer" }}
 {{ end }}
