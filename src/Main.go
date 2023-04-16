@@ -7,9 +7,11 @@ import (
 	"fmt"
 	_ "fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"html/template"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 	"strconv"
@@ -39,13 +41,18 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	http.HandleFunc("/home", homeHandler)
-	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/login", loginHandler)
-	http.HandleFunc("/catalog", catalogHandler)
-	http.HandleFunc("/about", aboutHandler)
-	http.HandleFunc("/contact", contactHandler)
-	http.HandleFunc("/logout", logout)
+
+	rtr := mux.NewRouter()
+	rtr.HandleFunc("/home", homeHandler)
+	rtr.HandleFunc("/register", registerHandler)
+	rtr.HandleFunc("/login", loginHandler)
+	rtr.HandleFunc("/catalog", catalogHandler)
+	rtr.HandleFunc("/about", aboutHandler)
+	rtr.HandleFunc("/contact", contactHandler)
+	rtr.HandleFunc("/logout", logout)
+	rtr.HandleFunc("/product/{id:[0-9]+}", productHandler)
+
+	http.Handle("/", rtr)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	http.ListenAndServe(":8080", nil)
 
@@ -295,4 +302,34 @@ func generateSessionKey() string {
 		return ""
 	}
 	return base64.StdEncoding.EncodeToString(key)
+}
+
+func productHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	t, err := template.ParseFiles("templates/product.html", "templates/header.html", "templates/footer.html")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
+
+	res, err := db.Query(fmt.Sprintf("SELECT * FROM `items` WHERE `item_id` = '%s'", vars["id"]))
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
+
+	var items = Item{}
+
+	for res.Next() {
+		var item Item
+		err := res.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+		}
+		items = item
+	}
+	t.ExecuteTemplate(w, "product", items)
+}
+
+func init() {
+	_ = mime.AddExtensionType(".js", "text/javascript")
 }

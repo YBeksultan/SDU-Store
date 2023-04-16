@@ -20,7 +20,7 @@
         <div id="buttons">
             <button class="button-value" value="All" name="category">All</button>
             <button class="button-value" value='Cup' name="category">
-                Cupm
+                Cup
             </button>
             <button class="button-value" value='Hoodie' name="category" >
                 Hoodie
@@ -60,7 +60,7 @@
         {{range .}}
         <li>
             <div class="card">
-                <img src="{{.ItemImage}}" alt="QR product" style="width:100%">
+                <img src="{{.ItemImage}}" alt="SDU_Store_product" style="width:100%">
                 <div class="item-text">
                     <h1 class="item-name">{{.ItemName}}</h1>
                 </div>
@@ -76,7 +76,7 @@
                 <p class="price">Cost: {{.ItemPrice}}₸</p>
                 <br>
                 <p>
-                    <button>Add to Cart</button>
+                    <button><a href="/product/{{.ItemId}}" style="text-decoration: none; color: white">More</a></button>
                 </p>
             </div>
         </li>
