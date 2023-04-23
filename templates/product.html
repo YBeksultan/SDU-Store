@@ -12,11 +12,44 @@
                 urna aliquam commodo. Suspendisse porta neque a dolor finibus, eget blandit metus pulvinar. Nullam vel
                 orci sit amet massa ullamcorper pretium non non odio.</p>
             <p class="product-price">Cost: {{.ItemPrice}}₸</p>
+            <div class="rating" style="display: flex">
+                <div class="star-wrapper">
+                    <a href="#" class="fas fa-star s1" onclick="popup()"></a>
+                    <a href="#" class="fas fa-star s2" onclick="popup()"></a>
+                    <a href="#" class="fas fa-star s3" onclick="popup()"></a>
+                    <a href="#" class="fas fa-star s4" onclick="popup()"></a>
+                    <a href="#" class="fas fa-star s5" onclick="popup()"></a>
+                </div>
+                <div class="popup" onclick="popup()">
+                    <span class="popuptext" id="myPopup">Thank You for the rating!</span>
+                </div>
+                <p style="font-size: 20px; padding-top: 0.3em; padding-left: 15px">(3.5)</p>
+            </div>
             <textarea class="text-area"></textarea>
             <button class="product-button">Add Comment</button>
         </div>
     </div>
+    <div>
+        <textarea class="text-area"></textarea>
+    </div>
+    <br>
+    <br>
+    <div>
+        <textarea class="text-area"></textarea>
+    </div>
+    <br>
+    <br>
+    <div>
+        <textarea class="text-area"></textarea>
+    </div>
 </div>
+
+<script>
+    function popup() {
+        var popup = document.getElementById("myPopup");
+        popup.classList.toggle("show");
+    }
+</script>
 
 {{ template "footer" }}
 {{ end }}

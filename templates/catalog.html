@@ -8,11 +8,13 @@
             <input class="search-area" type="text" name="search">
             <input class="search-btn" type="submit" value="Search">
             <div class="dropdown">
-                <label for="priceby">Price by:</label>
+                <label for="priceby">Products by:</label>
                 <select id="priceby" name="priceby">
                     <option value="">Choose order</option>
                     <option value="asc">Ascending order</option>
                     <option value="desc">Descending order</option>
+                    <option value="desc">By rating (ascending)</option>
+                    <option value="desc">By rating (descending)</option>
                 </select>
             </div>
         </div>
@@ -64,15 +66,6 @@
                 <div class="item-text">
                     <h1 class="item-name">{{.ItemName}}</h1>
                 </div>
-                <br>
-                <div class="star-wrapper">
-                    <a href="#" class="fas fa-star s1"></a>
-                    <a href="#" class="fas fa-star s2"></a>
-                    <a href="#" class="fas fa-star s3"></a>
-                    <a href="#" class="fas fa-star s4"></a>
-                    <a href="#" class="fas fa-star s5"></a>
-                </div>
-                <br>
                 <p class="price">Cost: {{.ItemPrice}}₸</p>
                 <br>
                 <p>

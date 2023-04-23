@@ -175,6 +175,10 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 					query += " ORDER BY item_price ASC"
 				} else if priceBy == "desc" {
 					query += " ORDER BY item_price DESC"
+				} else if priceBy == "rating_asc" {
+					query += " ORDER BY rating ASC"
+				} else if priceBy == "rating_desc" {
+					query += " ORDER BY rating DESC"
 				}
 				fmt.Println("Query" + query + " Priceby:" + priceBy)
 				rows, err := db.Query(query)
