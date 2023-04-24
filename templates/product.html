@@ -7,27 +7,37 @@
             <img src="{{.items.ItemImage}}" alt="SDU_Store_product">
         </div>
         <div class="product-info">
-            <form action="/save_comment" method="post">
-                <h1 class="product-title">{{.items.ItemName}}</h1>
-                <p class="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ac arcu
-                    sed
-                    urna aliquam commodo. Suspendisse porta neque a dolor finibus, eget blandit metus pulvinar. Nullam
-                    vel
-                    orci sit amet massa ullamcorper pretium non non odio.</p>
-                <p class="product-price">Cost: {{.items.ItemPrice}}₸</p>
+
+            <h1 class="product-title">{{.items.ItemName}}</h1>
+            <p class="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ac arcu
+                sed
+                urna aliquam commodo. Suspendisse porta neque a dolor finibus, eget blandit metus pulvinar. Nullam
+                vel
+                orci sit amet massa ullamcorper pretium non non odio.</p>
+            <p class="product-price">Cost: {{.items.ItemPrice}}₸</p>
+            <form method="post">
                 <div class="rating" style="display: flex">
                     <div class="star-wrapper">
-                        <a href="#" class="fas fa-star s1" onclick="popup()"></a>
-                        <a href="#" class="fas fa-star s2" onclick="popup()"></a>
-                        <a href="#" class="fas fa-star s3" onclick="popup()"></a>
-                        <a href="#" class="fas fa-star s4" onclick="popup()"></a>
-                        <a href="#" class="fas fa-star s5" onclick="popup()"></a>
+                        <input type="radio" id="r1" name="rg1">
+                        <label for="r1" class="fas fa-star s1"></label>
+                        <input type="radio" id="r2" name="rg1">
+                        <label for="r2" class="fas fa-star s2"></label>
+                        <input type="radio" id="r3" name="rg1">
+                        <label for="r3" class="fas fa-star s3"></label>
+                        <input type="radio" id="r4" name="rg1">
+                        <label for="r4" class="fas fa-star s4"></label>
+                        <input type="radio" id="r5" name="rg1">
+                        <label for="r5" class="fas fa-star s5"></label>
                     </div>
+
                     <div class="popup" onclick="popup()">
                         <span class="popuptext" id="myPopup">Thank You for the rating!</span>
                     </div>
-                    <p style="font-size: 1.8em; padding-left: 1em; color: gold; font-weight: bold">3.5</p>
+                    <p style="font-size: 1.8em; padding: 0 1em 0 1em; color: gold; font-weight: bold">3.5</p>
+                    <input style="background-color: #2d3b55; width: fit-content" type="submit" value="Rate">
                 </div>
+            </form>
+            <form action="/save_comment" method="post">
                 <textarea name="comment_text" class="text-area" placeholder="Add a comment"></textarea>
                 <button class="product-button">Add</button>
             </form>
@@ -35,15 +45,15 @@
     </div>
 
     {{ range $index, $value := . }}
-        {{ range $value }}
-            <div>
-                <label style="font-size: 1.4em" for="textarea">{{ .CommentAuthor }}</label>
-                <textarea disabled id="textarea" class="text-area" style="height: fit-content">{{ .CommentText }}</textarea>
-                <p style="float: right">Date: {{ .CommentDate }}</p>
-            </div>
-            <br>
-            <br>
-        {{ end }}
+    {{ range $value }}
+    <div>
+        <label style="font-size: 1.4em" for="textarea">{{ .CommentAuthor }}</label>
+        <textarea disabled id="textarea" class="text-area" style="height: fit-content">{{ .CommentText }}</textarea>
+        <p style="float: right">Date: {{ .CommentDate }}</p>
+    </div>
+    <br>
+    <br>
+    {{ end }}
     {{ end }}
 </div>
 
