@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 type User struct {
@@ -28,6 +29,15 @@ type Item struct {
 	ItemPrice float64
 	ItemImage string
 }
+
+type Comment struct {
+	CommentId   uint16
+	ItemId      uint16
+	CommentText string
+	CommentDate string
+}
+
+var id int
 
 var (
 	db    *sql.DB
@@ -50,6 +60,7 @@ func main() {
 	rtr.HandleFunc("/about", aboutHandler)
 	rtr.HandleFunc("/contact", contactHandler)
 	rtr.HandleFunc("/logout", logout)
+	rtr.HandleFunc("/save_comment", addComment)
 	rtr.HandleFunc("/product/{id:[0-9]+}", productHandler)
 
 	http.Handle("/", rtr)
@@ -111,6 +122,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		t.ExecuteTemplate(w, "register-success", nil)
 	}
 }
+
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session")
 
@@ -156,6 +168,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 	}
 }
+
 func logout(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session")
 
@@ -164,6 +177,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
+
 func catalogHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		priceBy := r.FormValue("priceby")
@@ -320,8 +334,7 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
 	}
-
-	var items = Item{}
+	m := map[string]interface{}{}
 
 	for res.Next() {
 		var item Item
@@ -329,9 +342,45 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Fprintf(w, err.Error())
 		}
-		items = item
+		m["items"] = item
 	}
-	t.ExecuteTemplate(w, "product", items)
+
+	com, err := db.Query(fmt.Sprintf("SELECT * FROM `comments` WHERE `item_id` = '%s'", vars["id"]))
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
+	id, _ = strconv.Atoi(vars["id"])
+
+	comments := make([]Comment, 0)
+
+	for com.Next() {
+		var comment Comment
+		err := com.Scan(&comment.CommentId, &comment.ItemId, &comment.CommentText, &comment.CommentDate)
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+		}
+		comments = append(comments, comment)
+	}
+	m["comments"] = comments
+	t.ExecuteTemplate(w, "product", m)
+}
+
+func addComment(w http.ResponseWriter, r *http.Request) {
+	comment := r.FormValue("comment_text")
+
+	date := time.Now().Format("2006-01-02 15:04 Monday")
+
+	if comment == "" {
+		fmt.Fprintf(w, "Please, write something")
+	} else {
+		insert, err := db.Query(fmt.Sprintf("INSERT INTO `comments` (`comment_text`, `item_id`, `comment_date`) VALUES ('%s', '%d', '%s')", comment, id, date))
+		if err != nil {
+			panic(err)
+		}
+		defer insert.Close()
+
+		http.Redirect(w, r, fmt.Sprintf("/product/%d", id), http.StatusSeeOther)
+	}
 }
 
 func init() {

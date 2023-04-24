@@ -4,44 +4,47 @@
 <div class="main">
     <div class="product-details">
         <div class="product-image">
-            <img src="{{.ItemImage}}" alt="SDU_Store_product">
+            <img src="{{.items.ItemImage}}" alt="SDU_Store_product">
         </div>
         <div class="product-info">
-            <h1 class="product-title">{{.ItemName}}</h1>
-            <p class="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ac arcu sed
-                urna aliquam commodo. Suspendisse porta neque a dolor finibus, eget blandit metus pulvinar. Nullam vel
-                orci sit amet massa ullamcorper pretium non non odio.</p>
-            <p class="product-price">Cost: {{.ItemPrice}}₸</p>
-            <div class="rating" style="display: flex">
-                <div class="star-wrapper">
-                    <a href="#" class="fas fa-star s1" onclick="popup()"></a>
-                    <a href="#" class="fas fa-star s2" onclick="popup()"></a>
-                    <a href="#" class="fas fa-star s3" onclick="popup()"></a>
-                    <a href="#" class="fas fa-star s4" onclick="popup()"></a>
-                    <a href="#" class="fas fa-star s5" onclick="popup()"></a>
+            <form action="/save_comment" method="post">
+                <h1 class="product-title">{{.items.ItemName}}</h1>
+                <p class="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ac arcu
+                    sed
+                    urna aliquam commodo. Suspendisse porta neque a dolor finibus, eget blandit metus pulvinar. Nullam
+                    vel
+                    orci sit amet massa ullamcorper pretium non non odio.</p>
+                <p class="product-price">Cost: {{.items.ItemPrice}}₸</p>
+                <div class="rating" style="display: flex">
+                    <div class="star-wrapper">
+                        <a href="#" class="fas fa-star s1" onclick="popup()"></a>
+                        <a href="#" class="fas fa-star s2" onclick="popup()"></a>
+                        <a href="#" class="fas fa-star s3" onclick="popup()"></a>
+                        <a href="#" class="fas fa-star s4" onclick="popup()"></a>
+                        <a href="#" class="fas fa-star s5" onclick="popup()"></a>
+                    </div>
+                    <div class="popup" onclick="popup()">
+                        <span class="popuptext" id="myPopup">Thank You for the rating!</span>
+                    </div>
+                    <p style="font-size: 1.8em; padding-left: 1em; color: gold; font-weight: bold">3.5</p>
                 </div>
-                <div class="popup" onclick="popup()">
-                    <span class="popuptext" id="myPopup">Thank You for the rating!</span>
-                </div>
-                <p style="font-size: 20px; padding-top: 0.3em; padding-left: 15px">(3.5)</p>
-            </div>
-            <textarea class="text-area"></textarea>
-            <button class="product-button">Add Comment</button>
+                <textarea name="comment_text" class="text-area" placeholder="Add a comment"></textarea>
+                <button class="product-button">Add</button>
+            </form>
         </div>
     </div>
-    <div>
-        <textarea class="text-area"></textarea>
-    </div>
-    <br>
-    <br>
-    <div>
-        <textarea class="text-area"></textarea>
-    </div>
-    <br>
-    <br>
-    <div>
-        <textarea class="text-area"></textarea>
-    </div>
+
+    {{ range $index, $value := . }}
+        {{ range $value }}
+            <div>
+                <label for="textarea">Username:</label>
+                <textarea disabled id="textarea" class="text-area" style="height: fit-content">{{ .CommentText }}</textarea>
+                <p style="float: right">Date: {{ .CommentDate }}</p>
+            </div>
+            <br>
+            <br>
+        {{ end }}
+    {{ end }}
 </div>
 
 <script>
