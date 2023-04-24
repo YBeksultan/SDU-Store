@@ -22,10 +22,24 @@
             <li><a href="/catalog">Catalog</a></li>
             <li><a href="/contact">Contact</a></li>
         </ul>
-        <ul class="not_registered" >
+        <ul id="not_registered">
             <li><a href="/register">Registration</a></li>
             <li><a href="/login">Login</a></li>
         </ul>
+        <ul id="registered">
+            <li>{{.Username}}</li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
     </div>
 </nav>
+<script>
+    if (document.cookie.indexOf("logged=") >= 0) {
+        document.getElementById("not_registered").style.display = "none";
+        document.getElementById("registered").style.display = "flex";
+    } else {
+        document.getElementById("not_registered").style.display = "flex";
+        document.getElementById("registered").style.display = "none";
+    }
+    console.log(document.cookie.indexOf("logged="));
+</script>
 {{ end }}

@@ -79,9 +79,9 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "session")
-
-	if session.Values["entered"] != nil && session.Values["entered"].(bool) {
+	session, _ := store.Get(r, "user-session")
+	logged, _ := session.Values["loggedIn"]
+	if logged == true {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
@@ -112,21 +112,28 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		session.Values["entered"] = true
+		session.Values["username"] = name
+		session.Values["loggedIn"] = true
 		err = session.Save(r, w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
+		logg, _ := store.Get(r, "logged")
+		err = logg.Save(r, w)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		t.ExecuteTemplate(w, "register-success", nil)
 	}
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "session")
+	session, _ := store.Get(r, "user-session")
 
-	if session.Values["entered"] != nil && session.Values["entered"].(bool) {
+	logged, _ := session.Values["loggedIn"]
+	if logged == true {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
@@ -159,8 +166,19 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			session.Values["entered"] = true
+			session.Values["username"] = name
+			session.Values["loggedIn"] = true
 			err = session.Save(r, w)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			logg, _ := store.Get(r, "logged")
+			err = logg.Save(r, w)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 			t.ExecuteTemplate(w, "login-success", nil)
 			return
 		}
@@ -170,15 +188,28 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "session")
-
-	session.Values["entered"] = false
-	session.Save(r, w)
-
+	logg, err := store.Get(r, "logged")
+	if err != nil {
+	}
+	logg.Options.MaxAge = -1
+	err = logg.Save(r, w)
+	if err != nil {
+	}
+	session, _ := store.Get(r, "user-session")
+	session.Values["loggedIn"] = false
+	err = session.Save(r, w)
+	if err != nil {
+	}
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 func catalogHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "user-session")
+	logged, _ := session.Values["loggedIn"]
+	if logged == false {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
 	if r.Method == "POST" {
 		priceBy := r.FormValue("priceby")
 		category := r.FormValue("category")
