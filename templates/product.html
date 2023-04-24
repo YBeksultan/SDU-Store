@@ -37,7 +37,7 @@
     {{ range $index, $value := . }}
         {{ range $value }}
             <div>
-                <label for="textarea">Username:</label>
+                <label style="font-size: 1.4em" for="textarea">{{ .CommentAuthor }}</label>
                 <textarea disabled id="textarea" class="text-area" style="height: fit-content">{{ .CommentText }}</textarea>
                 <p style="float: right">Date: {{ .CommentDate }}</p>
             </div>

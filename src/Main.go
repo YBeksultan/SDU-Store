@@ -31,10 +31,11 @@ type Item struct {
 }
 
 type Comment struct {
-	CommentId   uint16
-	ItemId      uint16
-	CommentText string
-	CommentDate string
+	CommentId     uint16
+	ItemId        uint16
+	CommentAuthor string
+	CommentText   string
+	CommentDate   string
 }
 
 var id int
@@ -113,6 +114,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		session.Values["username"] = name
+		session.Values["surname"] = surname
 		session.Values["loggedIn"] = true
 		err = session.Save(r, w)
 		if err != nil {
@@ -167,6 +169,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			session.Values["username"] = name
+			session.Values["surname"] = surname
 			session.Values["loggedIn"] = true
 			err = session.Save(r, w)
 			if err != nil {
@@ -386,7 +389,7 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 
 	for com.Next() {
 		var comment Comment
-		err := com.Scan(&comment.CommentId, &comment.ItemId, &comment.CommentText, &comment.CommentDate)
+		err := com.Scan(&comment.CommentId, &comment.ItemId, &comment.CommentAuthor, &comment.CommentText, &comment.CommentDate)
 		if err != nil {
 			fmt.Fprintf(w, err.Error())
 		}
@@ -397,6 +400,7 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func addComment(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "user-session")
 	comment := r.FormValue("comment_text")
 
 	date := time.Now().Format("2006-01-02 15:04 Monday")
@@ -404,7 +408,7 @@ func addComment(w http.ResponseWriter, r *http.Request) {
 	if comment == "" {
 		fmt.Fprintf(w, "Please, write something")
 	} else {
-		insert, err := db.Query(fmt.Sprintf("INSERT INTO `comments` (`comment_text`, `item_id`, `comment_date`) VALUES ('%s', '%d', '%s')", comment, id, date))
+		insert, err := db.Query(fmt.Sprintf("INSERT INTO `comments` (`comment_text`, `item_id`, `comment_author`, `comment_date`) VALUES ('%s', '%d', '%s', '%s')", comment, id, session.Values["username"], date))
 		if err != nil {
 			panic(err)
 		}
