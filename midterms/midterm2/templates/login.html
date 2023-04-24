@@ -1,0 +1,17 @@
+{{ define "login" }}
+{{ template "header" }}
+
+<div class="login-form">
+    <form action="/login" method="post">
+        <label for="id">ID:</label>
+        <input type="number" id="id" name="id" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <input type="submit" value="Login">
+    </form>
+</div>
+
+{{ template "footer" }}
+{{ end }}
