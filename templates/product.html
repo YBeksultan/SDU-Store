@@ -1,6 +1,7 @@
 {{ define "product" }}
 {{ template "header" }}
 
+
 <div class="main">
     <div class="product-details">
         <div class="product-image">
@@ -33,7 +34,7 @@
                     <div class="popup" onclick="popup()">
                         <span class="popuptext" id="myPopup">Thank You for the rating!</span>
                     </div>
-                    <p style="font-size: 1.8em; padding: 0 1em 0 1em; color: gold; font-weight: bold">3.7</p>
+                    <p style="font-size: 1.8em; padding: 0 1em 0 1em; color: gold; font-weight: bold">{{.rating.Rating}}</p>
                     <input style="background-color: #2d3b55; width: fit-content" type="submit" value="Rate">
                 </div>
             </form>
@@ -43,7 +44,6 @@
             </form>
         </div>
     </div>
-
     {{ range $index, $value := . }}
     {{ range $value }}
     <div>

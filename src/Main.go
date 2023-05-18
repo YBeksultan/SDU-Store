@@ -40,7 +40,7 @@ type Comment struct {
 
 type Rating struct {
 	ItemId uint16
-	rating uint16
+	Rating float64
 	author string
 }
 
@@ -121,6 +121,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		session.Values["username"] = name
+		session.Values["id"] = id
 		session.Values["surname"] = surname
 		session.Values["loggedIn"] = true
 		err = session.Save(r, w)
@@ -177,6 +178,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			session.Values["username"] = name
 			session.Values["surname"] = surname
+			session.Values["id"] = id
 			session.Values["loggedIn"] = true
 			err = session.Save(r, w)
 			if err != nil {
@@ -221,7 +223,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == "POST" {
-		priceBy := r.FormValue("priceby")
+		priceBy := r.FormValue("priceBy")
 		category := r.FormValue("category")
 		if category != "" {
 			if category == "All" {
@@ -230,12 +232,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 					query += " ORDER BY item_price ASC"
 				} else if priceBy == "desc" {
 					query += " ORDER BY item_price DESC"
-				} else if priceBy == "rating_asc" {
-					query += " ORDER BY rating ASC"
-				} else if priceBy == "rating_desc" {
-					query += " ORDER BY rating DESC"
 				}
-				fmt.Println("Query" + query + " Priceby:" + priceBy)
 				rows, err := db.Query(query)
 				if err != nil {
 					log.Fatal(err)
@@ -415,12 +412,11 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 			var tosend Rating = Rating{id16, total, session.Values["username"].(string)}
 			m["rating"] = tosend
 		}*/
-	com, err := db.Query(fmt.Sprintf("SELECT * FROM `comments` WHERE `item_id` = '%s'", vars["id"]))
+	com, err := db.Query(fmt.Sprintf("SELECT * FROM `comments` WHERE `item_id` = '%s' ORDER BY comment_date DESC", vars["id"]))
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
 	}
 	id, _ = strconv.Atoi(vars["id"])
-
 	comments := make([]Comment, 0)
 
 	for com.Next() {
@@ -432,6 +428,37 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 		comments = append(comments, comment)
 	}
 	m["comments"] = comments
+
+	ratings, err := db.Query(fmt.Sprintf("SELECT * FROM `ratings` WHERE `item_id` = '%s'", vars["id"]))
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
+	n := 0
+	sum := 0.0
+	for ratings.Next() {
+		var rating Rating
+		err := ratings.Scan(&rating.ItemId, &rating.Rating, &rating.author)
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+		}
+		sum += rating.Rating
+		n++
+	}
+	overall := sum / float64(n)
+	var ratingOfItem Rating
+	i, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	result := uint16(i)
+	ratingOfItem.ItemId = result
+	rate, err := strconv.ParseFloat(strconv.FormatFloat(overall, 'f', 1, 64), 64)
+	ratingOfItem.Rating = rate
+
+	m["rating"] = ratingOfItem
 	t.ExecuteTemplate(w, "product", m)
 }
 
@@ -463,15 +490,15 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	stars := r.Form.Get("rating")
 
-	row := db.QueryRow("SELECT * FROM ratings WHERE author = ?", session.Values["username"])
+	row := db.QueryRow("SELECT * FROM ratings WHERE author = ?", session.Values["id"])
 
 	var itemid uint
 	var rating string
 	var author string
-	authorr := session.Values["username"].(string)
+	var author_id = (session.Values["id"]).(int)
 	err = row.Scan(&itemid, &rating, &author)
 	if err == sql.ErrNoRows {
-		query := "INSERT INTO `ratings` (`item_id`, `rating`, `author`) VALUES ('" + strconv.Itoa(id) + "', '" + stars + "', '" + authorr + "')"
+		query := "INSERT INTO `ratings` (`item_id`, `rating`, `author`) VALUES ('" + strconv.Itoa(id) + "', '" + stars + "', '" + strconv.Itoa(author_id) + "')"
 		insert, err := db.Query(query)
 		if err != nil {
 			panic(err)
@@ -479,7 +506,7 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 		defer insert.Close()
 		http.Redirect(w, r, fmt.Sprintf("/product/%d", id), http.StatusSeeOther)
 	} else {
-		query := "UPDATE ratings SET rating=" + stars + " WHERE author='" + authorr + "';"
+		query := "UPDATE ratings SET rating=" + stars + " WHERE author='" + strconv.Itoa(author_id) + "';"
 		update, err := db.Query(fmt.Sprintf(query))
 		if err != nil {
 			panic(err)

@@ -1,6 +1,5 @@
 {{ define "catalog" }}
 {{ template "header" }}
-<script type="text/javascript" src="static/js/search.js"></script>
 <div class="search-form">
     <form class="search" action="/catalog" method="POST">
         <h1>Looking for...</h1><br>
@@ -8,13 +7,13 @@
             <input class="search-area" type="text" name="search">
             <input class="search-btn" type="submit" value="Search">
             <div class="dropdown">
-                <label for="priceby">Products by:</label>
-                <select id="priceby" name="priceby">
-                    <option value="">Choose order</option>
+                <label>Products by:</label>
+                <select id="priceBy" name="priceBy">
+                    <option value="" name="priceBy">Choose order</option>
                     <option value="asc">Ascending order</option>
                     <option value="desc">Descending order</option>
-                    <option value="desc">By rating (ascending)</option>
-                    <option value="desc">By rating (descending)</option>
+                    <option value="rateasc">By rating (ascending)</option>
+                    <option value="datedesc">By rating (descending)</option>
                 </select>
             </div>
         </div>
