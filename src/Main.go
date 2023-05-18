@@ -24,10 +24,12 @@ type User struct {
 }
 
 type Item struct {
-	ItemId    int
-	ItemName  string
-	ItemPrice float64
-	ItemImage string
+	ItemId     int
+	ItemName   string
+	ItemPrice  float64
+	ItemImage  string
+	ItemRating float64
+	ItemRated  int
 }
 
 type Comment struct {
@@ -42,6 +44,7 @@ type Rating struct {
 	ItemId uint16
 	Rating float64
 	author string
+	Count  int
 }
 
 var id int
@@ -243,7 +246,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 
 				for rows.Next() {
 					var item Item
-					err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+					err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage, &item.ItemRating, &item.ItemRated)
 					if err != nil {
 						log.Fatal(err)
 					}
@@ -266,7 +269,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 
 				for rows.Next() {
 					var item Item
-					err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+					err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage, &item.ItemRating, &item.ItemRated)
 					if err != nil {
 						log.Fatal(err)
 					}
@@ -291,7 +294,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 
 			for rows.Next() {
 				var item Item
-				err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+				err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage, &item.ItemRating, &item.ItemRated)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -316,7 +319,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 
 		for rows.Next() {
 			var item Item
-			err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+			err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage, &item.ItemRating, &item.ItemRated)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -376,7 +379,7 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 
 	for res.Next() {
 		var item Item
-		err := res.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage)
+		err := res.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage, &item.ItemRating, &item.ItemRated)
 		if err != nil {
 			fmt.Fprintf(w, err.Error())
 		}
@@ -444,7 +447,13 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 		sum += rating.Rating
 		n++
 	}
-	overall := sum / float64(n)
+	var overall float64
+
+	if n != 0 {
+		overall = sum / float64(n)
+	} else {
+		overall = 0.0
+	}
 	var ratingOfItem Rating
 	i, err := strconv.Atoi(vars["id"])
 
@@ -457,8 +466,18 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 	ratingOfItem.ItemId = result
 	rate, err := strconv.ParseFloat(strconv.FormatFloat(overall, 'f', 1, 64), 64)
 	ratingOfItem.Rating = rate
+	ratingOfItem.Count = n
 
 	m["rating"] = ratingOfItem
+	if n != 0 {
+		query := "UPDATE items SET rating=" + strconv.FormatFloat(overall, 'f', 1, 64) + ", rated = " + strconv.Itoa(n) + " WHERE item_id=" + strconv.Itoa(id) + ";"
+		update, err := db.Query(fmt.Sprintf(query))
+		if err != nil {
+			panic(err)
+		}
+		defer update.Close()
+	}
+
 	t.ExecuteTemplate(w, "product", m)
 }
 
@@ -490,7 +509,7 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	stars := r.Form.Get("rating")
 
-	row := db.QueryRow("SELECT * FROM ratings WHERE author = ?", session.Values["id"])
+	row := db.QueryRow("SELECT * FROM ratings WHERE author = ? and item_id = ?", session.Values["id"], id)
 
 	var itemid uint
 	var rating string

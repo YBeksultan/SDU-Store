@@ -65,8 +65,14 @@
                 <div class="item-text">
                     <h1 class="item-name">{{.ItemName}}</h1>
                 </div>
+                <div style = "display : flex">
+                    <p>Rating: {{.ItemRating}}</p>
+                    <p>({{.ItemRated}})</p>
+                </div>
                 <p class="price">Cost: {{.ItemPrice}}₸</p>
                 <br>
+
+
                 <p>
                     <a href="/product/{{.ItemId}}" style="text-decoration: none; color: white"><button>More</button></a>
                 </p>
