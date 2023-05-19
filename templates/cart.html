@@ -21,15 +21,62 @@
             <h1 class="item-name">{{.ItemName}}</h1>
             <p class="price">Cost: {{.ItemPrice}}₸</p>
             <div class="quantity">
-                <button class="decrement dec" data-productid="">-</button>
-                <input class="inp" type="number" value="" min="1">
-                <button class="increment inc" data-productid="">+</button>
+                <h1>Amount</h1>
+                <button class="decrement btn-quantity" data-productid=""><i class="fa fa-minus"></i></button>
+                <input style="font-size: 25px; min-width: 150px" class="inp" type="number" value="1" min="1">
+                <button class="increment btn-quantity" data-productid=""><i class="fa fa-plus"></i></button>
             </div>
+            <button style="background-color: transparent; border: none" type="button" onclick="removeProduct('{{ .ItemId }}')"><i
+                    style="cursor: pointer; color: #712323; font-size: 45px" class="fa fa-trash"></i></button>
+
+
+            <form id="remove_form" action="/remove_product" method="POST">
+                <input type="hidden" id="item_id" name="item_id">
+            </form>
         </div>
     </li>
     {{ end }}
     {{ end }}
 </div>
+
+<script>
+    const quantityElements = document.querySelectorAll('.quantity');
+
+    quantityElements.forEach(quantityElement => {
+        const decrementButton = quantityElement.querySelector('.decrement');
+        const incrementButton = quantityElement.querySelector('.increment');
+        const inputElement = quantityElement.querySelector('input');
+
+        decrementButton.addEventListener('click', () => {
+            const productId = decrementButton.getAttribute('data-productid');
+            const currentValue = parseInt(inputElement.value);
+            if (currentValue > 1) {
+                inputElement.value = currentValue - 1;
+                updateQuantity(productId, currentValue - 1);
+            }
+        });
+
+        incrementButton.addEventListener('click', () => {
+            const productId = incrementButton.getAttribute('data-productid');
+            const currentValue = parseInt(inputElement.value);
+            inputElement.value = currentValue + 1;
+            updateQuantity(productId, currentValue + 1);
+        });
+    });
+
+    function updateQuantity(productId, quantity) {
+        console.log(`Updating quantity for product ID ${productId} to ${quantity}`);
+    }
+
+
+    function removeProduct(productID) {
+        var confirmation = confirm("Are you sure you want to remove this item from the cart?");
+        if (confirmation) {
+            document.getElementById("item_id").value = productID;
+            document.getElementById("remove_form").submit();
+        }
+    }
+</script>
 
 
 {{ template "footer" }}
