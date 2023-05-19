@@ -45,6 +45,9 @@
             <button class="button-value" value='Sweatshirt' name="category">
                 Sweatshirt
             </button>
+            <a class="" style="padding-left: 15px" href="cart">
+                <i class="fa fa-shopping-cart btn-cart"></i>
+            </a>
         </div>
     </form>
 
@@ -65,9 +68,9 @@
                 <div class="item-text">
                     <h1 class="item-name">{{.ItemName}}</h1>
                 </div>
-                <div style = "display : flex">
-                    <p>Rating: {{.ItemRating}}</p>
-                    <p>({{.ItemRated}})</p>
+                <div style="font-size: 25px; font-weight: bold">
+                    <p style="color: gold">Rating: {{.ItemRating}}</p>
+                    <p style="color: grey">({{.ItemRated}})</p>
                 </div>
                 <p class="price">Cost: {{.ItemPrice}}₸</p>
                 <br>

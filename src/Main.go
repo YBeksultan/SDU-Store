@@ -73,6 +73,8 @@ func main() {
 	rtr.HandleFunc("/save_comment", addComment)
 	rtr.HandleFunc("/product/{id:[0-9]+}", productHandler)
 	rtr.HandleFunc("/submit", submitHandler)
+	rtr.HandleFunc("/cart", cartHandler)
+	rtr.HandleFunc("/add_to_cart", addToCart)
 
 	http.Handle("/", rtr)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
@@ -534,4 +536,79 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, fmt.Sprintf("/product/%d", id), http.StatusSeeOther)
 	}
 
+}
+
+func cartHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "user-session")
+	logged, _ := session.Values["loggedIn"]
+	if logged == false {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
+
+	var author_id = (session.Values["id"]).(int)
+
+	query := "SELECT * FROM cart WHERE cart_author = " + strconv.Itoa(author_id)
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	items := make([]Item, 0)
+
+	for rows.Next() {
+		var item Item
+		var author string
+		err := rows.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage, &author)
+		if err != nil {
+			log.Fatal(err)
+		}
+		items = append(items, item)
+	}
+	//
+	//if len(items) == 0 {
+	//
+	//}
+	//else {
+	//
+	//}
+	t, err := template.ParseFiles("templates/cart.html", "templates/header.html", "templates/footer.html")
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
+
+	t.ExecuteTemplate(w, "cart", items)
+}
+
+func addToCart(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "user-session")
+	row := db.QueryRow("SELECT * FROM cart WHERE cart_author = ? and item_id = ?", session.Values["id"], id)
+
+	var itemId int
+	var itemName string
+	var itemPrice int
+	var itemImage string
+	var cartAuthor int
+	err = row.Scan(&itemId, &itemName, &itemPrice, &itemImage, &cartAuthor)
+
+	if err == sql.ErrNoRows {
+		row2 := db.QueryRow("SELECT * from items WHERE item_id = ?", id)
+
+		var item Item
+		err := row2.Scan(&item.ItemId, &item.ItemName, &item.ItemPrice, &item.ItemImage, &item.ItemRating, &item.ItemRated)
+		var author_id = (session.Values["id"]).(int)
+
+		query := "INSERT INTO cart VALUES (" + strconv.Itoa(id) + ", '" + item.ItemName + "', " + strconv.FormatFloat(item.ItemPrice, 'f', -1, 64) + ", '" + item.ItemImage + "', " + strconv.Itoa(author_id) + ")"
+		insert, err := db.Query(query)
+
+		if err != nil {
+			panic(err)
+		}
+		defer insert.Close()
+		http.Redirect(w, r, fmt.Sprintf("/product/%d", id), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/product/%d", id), http.StatusSeeOther)
+
+	}
 }

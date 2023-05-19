@@ -1,0 +1,38 @@
+{{ define "cart" }}
+{{ template "header" }}
+
+<div class="cart-main">
+    <div class="empty-cart" style="display: none">
+        <h1 style="padding-top: 150px; font-size: 40px">Your cart is empty :(</h1>
+        <a href="catalog" style="color: black"><h1 style="padding-top: 20px; font-size: 25px">You can go to the catalog page</h1></a>
+    </div>
+    <div>
+
+    </div>
+
+    {{range .}}
+    <li>
+        <div class="card">
+            <img src="{{.ItemImage}}" alt="SDU_Store_product" style="width:100%">
+            <div class="item-text">
+                <h1 class="item-name">{{.ItemName}}</h1>
+            </div>
+            <div style="font-size: 25px; font-weight: bold">
+                <p style="color: gold">Rating: {{.ItemRating}}</p>
+                <p style="color: grey">({{.ItemRated}})</p>
+            </div>
+            <p class="price">Cost: {{.ItemPrice}}₸</p>
+            <br>
+
+
+            <p>
+                <a href="/product/{{.ItemId}}" style="text-decoration: none; color: white"><button>More</button></a>
+            </p>
+        </div>
+    </li>
+    {{end}}
+</div>
+
+
+{{ template "footer" }}
+{{ end }}

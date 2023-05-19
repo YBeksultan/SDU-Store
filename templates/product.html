@@ -3,6 +3,12 @@
 
 
 <div class="main">
+    <div class="button-back">
+        <label>
+            <a href="http://localhost:8080/catalog" class="fa fa-arrow-left"
+               style="color: #2d3b55; font-size: 30px; text-decoration: none"></a>
+        </label>
+    </div>
     <div class="product-details">
         <div class="product-image">
             <img src="{{.items.ItemImage}}" alt="SDU_Store_product">
@@ -34,9 +40,15 @@
                     <div class="popup" onclick="popup()">
                         <span class="popuptext" id="myPopup">Thank You for the rating!</span>
                     </div>
-                    <p style="font-size: 1.8em; padding: 0 0.3em 0 2em; color: gold; font-weight: bold">{{.rating.Rating}}<p style="font-size: 1.8em; padding: 0 1em 0 0; color: bisque;  font-weight: bold">({{.rating.Count}})</p></p>
+                    <p style="font-size: 1.8em; padding: 0 0.3em 0 2em; color: gold; font-weight: bold">
+                        {{.rating.Rating}}
+                    <p style="font-size: 1.8em; padding: 0 1em 0 0; color: bisque;  font-weight: bold">
+                        ({{.rating.Count}})</p></p>
                     <input style="background-color: #2d3b55; width: fit-content" type="submit" value="Rate">
                 </div>
+            </form>
+            <form action="/add_to_cart" method="post">
+                <input style="background-color: #2d3b55; width: fit-content; margin-left: 25px" type="submit" value="Add to cart">
             </form>
             <form action="/save_comment" method="post">
                 <textarea name="comment_text" class="text-area" placeholder="Add a comment"></textarea>

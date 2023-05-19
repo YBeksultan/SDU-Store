@@ -184,7 +184,7 @@ h1 {
 }
 
 .search-form {
-    width: 800px;
+    width: 820px;
     padding-top: 100px;
     align-content: center;
     margin: 0 auto 0 auto;
@@ -223,8 +223,14 @@ h1 {
     width: fit-content;
 }
 
+a i {
+    background-color: transparent;
+    color: #2d3b55;
+    font-size: 30px;
+    cursor: pointer;
+}
+
 .button-value {
-    width: 105px;
     text-align: center;
     margin-bottom: 5px;
     border: 2px solid #2d3b55;
@@ -357,6 +363,15 @@ input[type=number] {
     font-size: 13px;
 }
 
+.card-cart {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    margin: auto;
+    text-align: center;
+    background: #a7adc6;
+    font-size: 13px;
+}
+
 .card .item-name {
     padding: 0 5px 0 5px;
 }
@@ -474,6 +489,7 @@ input[type=number] {
 .contact-page {
     padding-top: 4.7%;
     min-height: 100%;
+    vertical-align: middle;
 }
 
 .contact-section {
@@ -672,6 +688,10 @@ input[type=radio]:checked ~ label {
     visibility: visible;
     -webkit-animation: fadeIn 1s;
     animation: fadeIn 1s
+}
+
+.cart-main {
+    min-height: 100%;
 }
 
 @-webkit-keyframes fadeIn {
