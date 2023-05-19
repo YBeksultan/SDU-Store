@@ -10,7 +10,6 @@
             page</h1></a>
     </div>
     {{ else }}
-
     {{range .}}
     <br>
     <br>
@@ -26,7 +25,8 @@
                 <input style="font-size: 25px; min-width: 150px" class="inp" type="number" value="1" min="1">
                 <button class="increment btn-quantity" data-productid=""><i class="fa fa-plus"></i></button>
             </div>
-            <button style="background-color: transparent; border: none" type="button" onclick="removeProduct('{{ .ItemId }}')"><i
+            <button style="background-color: transparent; border: none" type="button"
+                    onclick="removeProduct('{{ .ItemId }}')"><i
                     style="cursor: pointer; color: #712323; font-size: 45px" class="fa fa-trash"></i></button>
 
 
@@ -36,6 +36,13 @@
         </div>
     </li>
     {{ end }}
+    <div style="justify-content: center; text-align: center; margin-top: 50px">
+        <a href="/order">
+            <button class="cart-btn">
+                Buy Now
+            </button>
+        </a>
+    </div>
     {{ end }}
 </div>
 

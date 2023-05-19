@@ -1,0 +1,25 @@
+{{ define "order" }}
+{{ template "header" }}
+
+<form class="item-add-form" action="/order" method="POST">
+    <label for="cardNumber">Card Number:</label>
+    <input type="number" maxlength="19" id="cardNumber" name="cardNumber"><br>
+
+    <label>Expiry Date:</label>
+    <div style="display: flex">
+        <input type="number" maxlength="2" id="month" name="month" style="width:40px; margin-right: 20px"><br>
+        <input type="number" maxlength="2" id="year" name="year" style="width:40px"><br>
+    </div>
+    <label for="cvv">CVV:</label>
+    <input type="text" maxlength="3" id="cvv" name="cvv"><br>
+
+    <label for="address">Address:</label>
+    <input type="text" id="address" name="address"><br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required><br>
+
+    <input type="submit" value="Submit Payment">
+</form>
+{{ template "footer" }}
+{{ end }}

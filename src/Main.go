@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/rand"
 	"database/sql"
 	"encoding/base64"
 	"fmt"
@@ -11,8 +10,10 @@ import (
 	"github.com/gorilla/sessions"
 	"html/template"
 	"log"
+	"math/rand"
 	"mime"
 	"net/http"
+	"net/smtp"
 	"os"
 	"strconv"
 	"time"
@@ -76,6 +77,8 @@ func main() {
 	rtr.HandleFunc("/cart", cartHandler)
 	rtr.HandleFunc("/add_to_cart", addToCart)
 	rtr.HandleFunc("/add_item", addItem)
+	rtr.HandleFunc("/remove_product", removeProduct)
+	rtr.HandleFunc("/order", orderHandler)
 
 	http.Handle("/", rtr)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
@@ -645,4 +648,50 @@ func addItem(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/catalog", http.StatusSeeOther)
 	}
 
+}
+func removeProduct(w http.ResponseWriter, r *http.Request) {
+	itemID := r.FormValue("item_id")
+	fmt.Println(itemID)
+	query := "DELETE from cart WHERE item_id = " + itemID
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	http.Redirect(w, r, "/cart", http.StatusSeeOther)
+}
+func orderHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "user-session")
+	var author_id = (session.Values["id"]).(int)
+	if r.Method == "GET" {
+		t, err := template.ParseFiles("templates/order.html", "templates/header.html", "templates/footer.html")
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+		}
+
+		t.ExecuteTemplate(w, "order", nil)
+	} else if r.Method == "POST" {
+		email := r.FormValue("email")
+		sendEmail(email)
+		query := "DELETE from cart WHERE cart_author = " + strconv.Itoa(author_id)
+		rows, err := db.Query(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+		http.Redirect(w, r, "/catalog", http.StatusSeeOther)
+	}
+}
+func sendEmail(email string) {
+	auth := smtp.PlainAuth("", "sdutalkreset@gmail.com", "mfvinfuohpjeuhxi", "smtp.gmail.com")
+	randNum := generateRandomNumber()
+	err := smtp.SendMail("smtp.gmail.com:587", auth, "sdutalkreset@gmail.com", []string{email}, []byte("Subject: SDU Store\nThank You for purchase! \nYour order id is: "+strconv.Itoa(randNum)+"\nCome again, we will be glad to see you in our store!"))
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func generateRandomNumber() int {
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(901) + 100
 }

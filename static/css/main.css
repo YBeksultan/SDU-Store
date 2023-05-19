@@ -377,6 +377,19 @@ input[type=number] {
     font-size: 13px;
 }
 
+.cart-btn {
+    height: 55px;
+    width: 170px;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    font-size: 20px;
+    background-color: green;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
 .quantity {
     display: inline-block;
     align-items: center;
