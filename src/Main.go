@@ -176,26 +176,27 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		var userPassword string
 		var isAdmin int
 		err = row.Scan(&userid, &name, &surname, &userPassword, &userEmail, &isAdmin)
-		if isAdmin == 1 {
-			session.Values["admin"] = true
-			err = session.Save(r, w)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		} else {
-			session.Values["admin"] = false
-			err = session.Save(r, w)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		}
+
 		if err == sql.ErrNoRows {
 			fmt.Println("No user found with the given email and password.")
 		} else if err != nil {
 			panic(err)
 		} else {
+			if isAdmin == 1 {
+				session.Values["admin"] = true
+				err = session.Save(r, w)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			} else {
+				session.Values["admin"] = false
+				err = session.Save(r, w)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
 			t, err := template.ParseFiles("templates/login-success.html", "templates/header.html", "templates/footer.html")
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -234,6 +235,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	}
 	session, _ := store.Get(r, "user-session")
 	session.Values["loggedIn"] = false
+	session.Values["admin"] = 0
 	err = session.Save(r, w)
 	if err != nil {
 	}
@@ -316,7 +318,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			name := r.FormValue("search")
-			query := "SELECT * FROM items WHERE item_name LIKE %" + name + "%"
+			query := "SELECT * FROM items WHERE item_name LIKE '%" + name + "%'"
 			if priceBy == "rateAsc" {
 				query += " ORDER BY rating ASC"
 			} else if priceBy == "rateDesc" {
@@ -572,13 +574,7 @@ func cartHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		items = append(items, item)
 	}
-	//
-	//if len(items) == 0 {
-	//
-	//}
-	//else {
-	//
-	//}
+
 	t, err := template.ParseFiles("templates/cart.html", "templates/header.html", "templates/footer.html")
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
