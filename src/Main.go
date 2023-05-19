@@ -75,6 +75,7 @@ func main() {
 	rtr.HandleFunc("/submit", submitHandler)
 	rtr.HandleFunc("/cart", cartHandler)
 	rtr.HandleFunc("/add_to_cart", addToCart)
+	rtr.HandleFunc("/remove_product", removeProduct)
 
 	http.Handle("/", rtr)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
@@ -611,4 +612,17 @@ func addToCart(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, fmt.Sprintf("/product/%d", id), http.StatusSeeOther)
 
 	}
+}
+
+func removeProduct(w http.ResponseWriter, r *http.Request) {
+	itemID := r.FormValue("item_id")
+	fmt.Println(itemID)
+	query := "DELETE from cart WHERE item_id = " + itemID
+	fmt.Println(query)
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	http.Redirect(w, r, "/cart", http.StatusSeeOther)
 }

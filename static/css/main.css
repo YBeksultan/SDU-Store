@@ -364,12 +364,39 @@ input[type=number] {
 }
 
 .card-cart {
+    padding: 30px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
-    max-width: 500px;
-    margin: auto;
-    text-align: center;
+    max-width: 1500px;
+    max-height: 300px;
+    display: flex;
+    margin: 30px 30px 0 30px;
     background: #a7adc6;
+    text-align: center;
+    justify-content: space-between;
+    align-items: center;
     font-size: 13px;
+}
+
+.quantity {
+    display: inline-block;
+    align-items: center;
+}
+
+.quantity .inp {
+    width: 40px;
+    text-align: center;
+    border: none;
+    border-radius: 4px;
+    margin-right: 5px;
+}
+
+.quantity .btn-quantity {
+    font-size: 20px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
 }
 
 .card .item-name {
