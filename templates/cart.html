@@ -1,36 +1,34 @@
 {{ define "cart" }}
 {{ template "header" }}
 
-<div class="cart-main">
-    <div class="empty-cart" style="display: none">
+<div class="cart-main" style="margin-bottom: 100px;">
+    <h1 class="title-cart" style="padding-top: 150px; font-size: 50px">Cart</h1>
+    {{ if not . }}
+    <div class="empty-cart">
         <h1 style="padding-top: 150px; font-size: 40px">Your cart is empty :(</h1>
-        <a href="catalog" style="color: black"><h1 style="padding-top: 20px; font-size: 25px">You can go to the catalog page</h1></a>
+        <a href="catalog" style="color: black"><h1 style="padding-top: 20px; font-size: 25px">You can go to the catalog
+            page</h1></a>
     </div>
-    <div>
-
-    </div>
+    {{ else }}
 
     {{range .}}
-    <li>
-        <div class="card">
-            <img src="{{.ItemImage}}" alt="SDU_Store_product" style="width:100%">
-            <div class="item-text">
-                <h1 class="item-name">{{.ItemName}}</h1>
-            </div>
-            <div style="font-size: 25px; font-weight: bold">
-                <p style="color: gold">Rating: {{.ItemRating}}</p>
-                <p style="color: grey">({{.ItemRated}})</p>
-            </div>
+    <br>
+    <br>
+    <br>
+    <li style="list-style: none">
+        <div class="card-cart">
+            <img src="{{.ItemImage}}" alt="SDU_Store_product" style="width: 15%">
+            <h1 class="item-name">{{.ItemName}}</h1>
             <p class="price">Cost: {{.ItemPrice}}₸</p>
-            <br>
-
-
-            <p>
-                <a href="/product/{{.ItemId}}" style="text-decoration: none; color: white"><button>More</button></a>
-            </p>
+            <div class="quantity">
+                <button class="decrement dec" data-productid="">-</button>
+                <input class="inp" type="number" value="" min="1">
+                <button class="increment inc" data-productid="">+</button>
+            </div>
         </div>
     </li>
-    {{end}}
+    {{ end }}
+    {{ end }}
 </div>
 
 

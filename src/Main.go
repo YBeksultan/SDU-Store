@@ -19,7 +19,7 @@ import (
 )
 
 type User struct {
-	Id                                 int
+	Id, isAdmin                        int
 	Username, Surname, Password, Email string
 }
 
@@ -75,6 +75,7 @@ func main() {
 	rtr.HandleFunc("/submit", submitHandler)
 	rtr.HandleFunc("/cart", cartHandler)
 	rtr.HandleFunc("/add_to_cart", addToCart)
+	rtr.HandleFunc("/add_item", addItem)
 
 	http.Handle("/", rtr)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
@@ -111,9 +112,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		surname := r.FormValue("surname")
 		password := r.FormValue("password")
 		email := r.FormValue("email")
-		var user User = User{id, name, surname, password, email}
+		var user User = User{id, 0, name, surname, password, email}
 		query := "INSERT INTO users VALUES ('" + strconv.Itoa(user.Id) + "','" + user.Username +
-			"','" + user.Surname + "','" + user.Password + "','" + user.Email + "');"
+			"','" + user.Surname + "','" + user.Password + "','" + user.Email + "', 0);"
 		insert, err := db.Query(query)
 		if err != nil {
 			fmt.Println(query)
@@ -170,7 +171,23 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		var surname string
 		var userEmail string
 		var userPassword string
-		err = row.Scan(&userid, &name, &surname, &userPassword, &userEmail)
+		var isAdmin int
+		err = row.Scan(&userid, &name, &surname, &userPassword, &userEmail, &isAdmin)
+		if isAdmin == 1 {
+			session.Values["admin"] = true
+			err = session.Save(r, w)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		} else {
+			session.Values["admin"] = false
+			err = session.Save(r, w)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
 		if err == sql.ErrNoRows {
 			fmt.Println("No user found with the given email and password.")
 		} else if err != nil {
@@ -237,6 +254,10 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 					query += " ORDER BY item_price ASC"
 				} else if priceBy == "desc" {
 					query += " ORDER BY item_price DESC"
+				} else if priceBy == "rateAsc" {
+					query += " ORDER BY rating ASC"
+				} else if priceBy == "rateDesc" {
+					query += " ORDER BY rating DESC"
 				}
 				rows, err := db.Query(query)
 				if err != nil {
@@ -261,7 +282,13 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 					log.Fatal(err)
 				}
 			} else {
-				rows, err := db.Query("SELECT * FROM items WHERE item_name LIKE ?", "%"+category+"%")
+				query := "SELECT * FROM items WHERE item_name LIKE '%" + category + "%'"
+				if priceBy == "rateAsc" {
+					query += " ORDER BY rating ASC"
+				} else if priceBy == "rateDesc" {
+					query += " ORDER BY rating DESC"
+				}
+				rows, err := db.Query(query)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -286,7 +313,13 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			name := r.FormValue("search")
-			rows, err := db.Query("SELECT * FROM items WHERE item_name LIKE ?", "%"+name+"%")
+			query := "SELECT * FROM items WHERE item_name LIKE %" + name + "%"
+			if priceBy == "rateAsc" {
+				query += " ORDER BY rating ASC"
+			} else if priceBy == "rateDesc" {
+				query += " ORDER BY rating DESC"
+			}
+			rows, err := db.Query(query)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -387,36 +420,6 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		m["items"] = item
 	}
-	/*
-		query := "SELECT * FROM ratings where item_id = " + strconv.Itoa(id)
-		rows, err := db.Query(query)
-		if err != nil {
-			log.Fatal(err)
-		}
-		rate := 0
-		count := 0
-		ratings := make([]Rating, 0)
-
-		id16 := uint16(id)
-
-		for rows.Next() {
-			count += 1
-			var rating Rating
-			err := rows.Scan(&rating.ItemId, &rating.rating, &rating.author)
-			rate += int(rating.rating)
-			if err != nil {
-				log.Fatal(err)
-			}
-			ratings = append(ratings, rating)
-		}
-		if (count == 0) {
-			var tosend Rating = Rating{id16, 0, session.Values["username"].(string)}
-			m["rating"] = tosend
-		} else {
-			total := uint16(rate / count)
-			var tosend Rating = Rating{id16, total, session.Values["username"].(string)}
-			m["rating"] = tosend
-		}*/
 	com, err := db.Query(fmt.Sprintf("SELECT * FROM `comments` WHERE `item_id` = '%s' ORDER BY comment_date DESC", vars["id"]))
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
@@ -611,4 +614,35 @@ func addToCart(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, fmt.Sprintf("/product/%d", id), http.StatusSeeOther)
 
 	}
+}
+
+func addItem(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "user-session")
+	admin, _ := session.Values["admin"]
+	if admin == false {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
+	if r.Method == "GET" {
+		t, err := template.ParseFiles("templates/addItem.html", "templates/header.html", "templates/footer.html")
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+		}
+
+		t.ExecuteTemplate(w, "add_item", nil)
+	} else if r.Method == "POST" {
+		item_name := r.FormValue("item_name")
+		price, _ := strconv.Atoi(r.FormValue("price"))
+		image := r.FormValue("image")
+		query := "INSERT INTO items(item_name, item_price, item_image, rating, rated) VALUES ('" + item_name + "'," + strconv.Itoa(price) +
+			",'" + image + "',0.0 ,0);"
+		insert, err := db.Query(query)
+		if err != nil {
+			fmt.Println(query)
+			panic(err.Error())
+		}
+		defer insert.Close()
+		http.Redirect(w, r, "/catalog", http.StatusSeeOther)
+	}
+
 }
